@@ -43,14 +43,17 @@ INSTALL = install
 INSTALLd = install -d
 
 SOINST = libzonoml.so
+AINST = libzonoml.a
 
 zonomlH = zonoml.h 
 
-all : libzonoml.so elina_test_zonoml
+all : libzonoml.so libzonoml.a elina_test_zonoml
 
 libzonoml.so : $(OBJS) $(zonomlH)
 	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS)
 
+libzonoml.a : $(OBJS) $(zonomlH)
+	ar rcs $(AINST) $(OBJS)
 
 zonoml_internal.o : zonoml_internal.h zonoml_internal.c
 	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) -o zonoml_internal.o zonoml_internal.c $(LIBS)
@@ -69,6 +72,9 @@ install:
 	for i in $(SOINST); do \
 		$(INSTALL) $$i $(LIBDIR); \
 	done;
+	for i in $(AINST); do \
+		$(INSTALL) $$i $(LIBDIR); \
+	done;
 
 	$(INSTALLd) $(INCLDIR); \
 	for i in $(zonomlH); do \
@@ -79,5 +85,6 @@ install:
 clean:
 	-rm *.o
 	-rm *.so
+	-rm *.a
 	-rm elina_test_zonoml
 

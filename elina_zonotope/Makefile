@@ -43,13 +43,17 @@ INSTALL = install
 INSTALLd = install -d
 
 SOINST = libzonotope.so
+AINST = libzonotope.a
 
 ZONOTOPEH = zonotope.h elina_box.h
 
-all : libzonotope.so
+all : libzonotope.so libzonotope.a
 
 libzonotope.so : $(OBJS) $(ZONOTOPEH)
 	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS)
+
+libzonotope.a : $(OBJS) $(ZONOTOPEH)
+	ar rcs $(AINST) $(OBJS)
 
 elina_box_internal.o : elina_box_internal.h elina_box_internal.c
 	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) -o elina_box_internal.o elina_box_internal.c $(LIBS)
@@ -95,6 +99,9 @@ install:
 	for i in $(SOINST); do \
 		$(INSTALL) $$i $(LIBDIR); \
 	done;
+	for i in $(AINST); do \
+		$(INSTALL) $$i $(LIBDIR); \
+	done;
 
 	$(INSTALLd) $(INCLDIR); \
 	for i in $(ZONOTOPEH); do \
@@ -105,4 +112,5 @@ install:
 clean:
 	-rm *.o
 	-rm *.so
+	-rm *.a
 

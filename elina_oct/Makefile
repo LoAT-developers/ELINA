@@ -55,12 +55,14 @@ INSTALLd = install -d
 
 SOINST = liboptoct.so
 
+AINST = liboptoct.a
+
 ifeq ($(LAIT), 1)
 OPTOCTH = opt_oct.h opt_oct_internal.h opt_oct_hmat.h $(CLOSUREH) opt_oct_lait.h
-all : liboptoct.so elina_test_oct elina_test_oct_lait
+all : liboptoct.so liboptoct.a elina_test_oct elina_test_oct_lait
 else
 OPTOCTH = opt_oct.h opt_oct_internal.h opt_oct_hmat.h $(CLOSUREH)
-all : liboptoct.so elina_test_oct
+all : liboptoct.so liboptoct.a elina_test_oct
 endif
 
 opt_oct_closure_comp_sparse.o : opt_oct_closure_comp_sparse.h opt_oct_closure_comp_sparse.c
@@ -113,6 +115,9 @@ opt_oct_lait.o : opt_oct_lait.h opt_oct_lait.c
 liboptoct.so : $(OBJS) opt_oct_lait.o $(OPTOCTH)
 	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) opt_oct_lait.o $(LIBS) $(PYTHON_LIBS)
 
+liboptoct.a : $(OBJS) opt_oct_lait.o $(OPTOCTH)
+	ar rcs $(AINST) $(OBJS) opt_oct_lait.o
+
 elina_test_oct : elina_test_oct.c liboptoct.so
 	$(CC) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o elina_test_oct elina_test_oct.c $(LIBS) $(PYTHON_LIBS) -L. -loptoct
 
@@ -122,6 +127,9 @@ else
 liboptoct.so : $(OBJS) $(OPTOCTH)
 	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS)
 
+liboptoct.a : $(OBJS) $(OPTOCTH)
+	ar rcs $(AINST) $(OBJS)
+
 elina_test_oct : elina_test_oct.c liboptoct.so
 	$(CC) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o elina_test_oct elina_test_oct.c $(LIBS) -L. -loptoct
 endif
@@ -129,6 +137,9 @@ endif
 install:
 	$(INSTALLd) $(LIBDIR); \
 	for i in $(SOINST); do \
+		$(INSTALL) $$i $(LIBDIR); \
+	done;
+	for i in $(AINST); do \
 		$(INSTALL) $$i $(LIBDIR); \
 	done; 
 
@@ -138,6 +149,7 @@ install:
 	done; 
 
 clean:
-	-rm $(SOINST) 
+	-rm $(SOINST)
+	-rm $(AINST)
 	-rm *.o
 	-rm elina_test_oct

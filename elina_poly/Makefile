@@ -43,13 +43,14 @@ INSTALL = install
 INSTALLd = install -d
 
 SOINST = liboptpoly.so
+AINST = liboptpoly.a
 
 ifeq ($(LAIT), 1)
 OPTPOLYH = opt_mf_qsort.h opt_pk_matrix.h  opt_pk_internal.h opt_pk_test.h opt_pk_config.h opt_pk.h opt_pk_lait.h
-all : liboptpoly.so elina_test_poly elina_test_poly_lait
+all : liboptpoly.so liboptpoly.a elina_test_poly elina_test_poly_lait
 else
 OPTPOLYH = opt_mf_qsort.h opt_pk_matrix.h  opt_pk_internal.h opt_pk_test.h opt_pk_config.h opt_pk.h
-all : liboptpoly.so elina_test_poly
+all : liboptpoly.so liboptpoly.a elina_test_poly
 endif
 
 opt_mf_qsort.o : opt_mf_qsort.h opt_mf_qsort.c
@@ -115,6 +116,9 @@ opt_pk_lait.o : opt_pk_lait.h opt_pk_lait.c
 liboptpoly.so : $(OBJS) opt_pk_lait.o $(OPTPOLYH)
 	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) opt_pk_lait.o $(LIBS) $(PYTHON_LIBS)
 
+liboptpoly.a : $(OBJS) opt_pk_lait.o $(OPTPOLYH)
+	ar rcs $(AINST) $(OBJS) opt_pk_lait.o
+
 elina_test_poly : elina_test_poly.c liboptpoly.so
 	$(CC) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o elina_test_poly elina_test_poly.c $(LIBS) $(PYTHON_LIBS) -L. -loptpoly 
 
@@ -124,6 +128,9 @@ else
 liboptpoly.so : $(OBJS) $(OPTPOLYH)
 	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS)
 
+liboptpoly.a : $(OBJS) $(OPTPOLYH)
+	ar rcs $(AINST) $(OBJS)
+
 elina_test_poly : elina_test_poly.c liboptpoly.so
 	$(CC) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o elina_test_poly elina_test_poly.c $(LIBS) -L. -loptpoly 
 endif
@@ -131,6 +138,9 @@ endif
 install:
 	$(INSTALLd) $(LIBDIR); \
 	for i in $(SOINST); do \
+		$(INSTALL) $$i $(LIBDIR); \
+	done;
+	for i in $(AINST); do \
 		$(INSTALL) $$i $(LIBDIR); \
 	done;
 
@@ -143,4 +153,5 @@ install:
 clean:
 	-rm *.o
 	-rm *.so
+	-rm *.a
 	-rm elina_test_poly

@@ -38,6 +38,7 @@ ifneq ($(BOOST_PREFIX),)
 endif
 
 SOINST = libfconv.so
+AINST = libfconv.a
 FCONVH = fconv.h
 
 CXXFLAGS := -std=c++14 -Wall -Wextra -Wpedantic -flto -mfma -mavx2 -DGMPRATIONAL -fPIC
@@ -45,10 +46,13 @@ ifeq ($(DEBUG),)
 	CXXFLAGS := $(CXXFLAGS) -DNDEBUG -O3 -march=native
 endif
 
-all: libfconv.so tests
+all: libfconv.so libfconv.a tests
 
 $(SOINST): $(OBJS)
 	$(CXX) -shared $(CC_ELINA_DYLIB) $(CXXFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS)
+
+$(AINST): $(OBJS)
+	ar rcs $(AINST) $(OBJS)
 
 tests: tests.cpp $(OBJS)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^ $(LIBS)
@@ -61,6 +65,9 @@ install:
 	for i in $(SOINST); do \
 		$(INSTALL) $$i $(LIBDIR); \
 	done;
+	for i in $(AINST); do \
+		$(INSTALL) $$i $(LIBDIR); \
+	done;
 
 	$(INSTALLd) $(INCLDIR); \
 	for i in $(FCONVH); do \
@@ -70,6 +77,7 @@ install:
 clean:
 	-rm *.o
 	-rm *.so
+	-rm *.a
 	-rm tests
 
 .PHONY: test

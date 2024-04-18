@@ -39,9 +39,11 @@ INSTALLd = install -d
 
 SOINST = libelinaux.so
 
+AINST = libelinaux.a
+
 ELINAAUXH = elina_config.h elina_scalar.h elina_interval.h elina_coeff.h elina_dimension.h elina_linexpr0.h elina_lincons0.h elina_manager.h elina_abstract0.h elina_texpr0.h elina_tcons0.h
 
-all :	libelinaux.so
+all :	libelinaux.so libelinaux.a
 
 elina_scalar.o : elina_scalar.h elina_scalar.c
 	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) -o elina_scalar.o elina_scalar.c $(LIBS)
@@ -77,9 +79,15 @@ elina_tcons0.o : elina_tcons0.h elina_tcons0.c
 libelinaux.so : $(OBJS) $(ELINAAUXH)
 	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS)
 
+libelinaux.a : $(OBJS) $(ELINAAUXH)
+	ar rcs $(AINST) $(OBJS)
+
 install:
 	$(INSTALLd) $(LIBDIR); \
 	for i in $(SOINST); do \
+		$(INSTALL) $$i $(LIBDIR); \
+	done;
+	for i in $(AINST); do \
 		$(INSTALL) $$i $(LIBDIR); \
 	done;
 
@@ -92,3 +100,4 @@ install:
 clean:
 	-rm *.o
 	-rm *.so
+	-rm *.a

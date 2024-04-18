@@ -39,9 +39,11 @@ endif
 
 SOINST = liboptzones.so
 
+AINST = liboptzones.a
+
 OPTZONESH = opt_zones.h opt_zones_internal.h opt_mat.h
 
-all : liboptzones.so
+all : liboptzones.so liboptzones.a
 
 opt_mat.o : opt_mat.h opt_mat.c
 	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) -o opt_mat.o opt_mat.c $(LIBS)
@@ -70,9 +72,15 @@ opt_zones_representation.o : opt_zones_representation.c opt_zones_internal.h
 liboptzones.so : $(OBJS) $(OPTZONESH)
 	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS)
 
+liboptzones.a : $(OBJS) $(OPTZONESH)
+	ar rcs $(AINST) $(OBJS)
+
 install:
 	$(INSTALLd) $(LIBDIR); \
 	for i in $(SOINST); do \
+		$(INSTALL) $$i $(LIBDIR); \
+	done;
+	for i in $(AINST); do \
 		$(INSTALL) $$i $(LIBDIR); \
 	done; 
 
@@ -82,5 +90,6 @@ install:
 	done; 
 
 clean:
-	-rm $(SOINST) 
+	-rm $(SOINST)
+	-rm $(AINST) 
 	-rm *.o

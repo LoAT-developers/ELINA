@@ -23,7 +23,9 @@ include ../Makefile.config
 
 SOINST = libpartitions.so
 
-OBJS = comp_list.o array_comp_list.o intersection.o union.o extract.o 
+AINST = libpartitions.a
+
+OBJS = comp_list.o array_comp_list.o intersection.o union.o extract.o
 
 LIBDIR = $(ELINA_PREFIX)/lib
 
@@ -36,7 +38,7 @@ INSTALLd = install -d
 
 INCLUDES= -I../
 
-all: libpartitions.so
+all: libpartitions.so libpartitions.a
 
 comp_list.o: comp_list.h comp_list.c
 	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) $(AFLAGS) -o comp_list.o comp_list.c $(LIBS) 
@@ -58,11 +60,15 @@ extract.o: comp_list.h extract.c
 	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) $(AFLAGS) -o extract.o extract.c $(LIBS) 
 
 libpartitions.so: $(OBJS)
-	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS) 
+	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS)
+
+libpartitions.a: $(OBJS)
+	ar rcs $(AINST) $(OBJS)
 
 install: 
 	$(INSTALLd) $(LIBDIR); \
 	$(INSTALL) $(SOINST) $(LIBDIR);
+	$(INSTALL) $(AINST) $(LIBDIR);
 	$(INSTALLd) $(INCLDIR); \
 	for i in $(PARTITIONSH); do \
 		$(INSTALL) $$i $(INCLDIR); \
@@ -70,4 +76,4 @@ install:
 
 
 clean:
-	-rm $(OBJS) libpartitions.so
+	-rm $(OBJS) libpartitions.so libpartitions.a

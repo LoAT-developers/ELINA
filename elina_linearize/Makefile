@@ -42,10 +42,11 @@ INSTALL = install
 INSTALLd = install -d
 
 SOINST = libelinalinearize.so
+AINST = libelinalinearize.a
 
 ELINALINEARIZEH = elina_generic.h elina_scalar_arith.h elina_interval_arith.h elina_coeff_arith.h elina_linexpr0_arith.h elina_linearize.h elina_linearize_texpr.h elina_rat.h elina_int.h
 
-all :	libelinalinearize.so 
+all :	libelinalinearize.so libelinalinearize.a
 
 elina_generic.o : elina_generic.h elina_generic.c
 	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) -o elina_generic.o elina_generic.c $(LIBS)	
@@ -71,9 +72,15 @@ elina_linearize_texpr.o : elina_linearize_texpr.h elina_linearize_texpr.c
 libelinalinearize.so : $(OBJS) $(ELINALINEARIZEH)
 	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS)
 
+libelinalinearize.a : $(OBJS) $(ELINALINEARIZEH)
+	ar rcs $(AINST) $(OBJS)
+
 install:
 	$(INSTALLd) $(LIBDIR); \
 	for i in $(SOINST); do \
+		$(INSTALL) $$i $(LIBDIR); \
+	done;
+	for i in $(AINST); do \
 		$(INSTALL) $$i $(LIBDIR); \
 	done;
 
@@ -86,3 +93,4 @@ install:
 clean:
 	-rm *.o
 	-rm *.so
+	-rm *.a

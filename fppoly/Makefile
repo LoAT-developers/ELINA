@@ -49,13 +49,17 @@ INSTALL = install
 INSTALLd = install -d
 
 SOINST = libfppoly.so
+AINST = libfppoly.a
 
 FPPOLYH = fppoly.h 
 
-all : libfppoly.so 
+all : libfppoly.so libfppoly.a
 
 libfppoly.so : $(OBJS) $(FPPOLYH)
 	$(CC) -shared $(CC_ELINA_DYLIB) $(CFLAGS) $(DFLAGS) $(INCLUDES) -o $(SOINST) $(OBJS) $(LIBS)
+
+libfppoly.a : $(OBJS) $(FPPOLYH)
+	ar rcs $(AINST) $(OBJS)
 
 fppoly.o : fppoly.h fppoly.c
 	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) -o fppoly.o fppoly.c $(LIBS)
@@ -77,7 +81,7 @@ leakyrelu_approx.o : leakyrelu_approx.h leakyrelu_approx.c
 
 round_approx.o : round_approx.h round_approx.c
 	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) -o round_approx.o round_approx.c $(LIBS)
-		
+
 clip_approx.o : clip_approx.h clip_approx.c
 	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) -o clip_approx.o clip_approx.c $(LIBS)
 
@@ -112,6 +116,9 @@ install:
 	for i in $(SOINST); do \
 		$(INSTALL) $$i $(LIBDIR); \
 	done;
+	for i in $(AINST); do \
+		$(INSTALL) $$i $(LIBDIR); \
+	done;
 
 	$(INSTALLd) $(INCLDIR); \
 	for i in $(FPPOLYH); do \
@@ -122,4 +129,5 @@ install:
 clean:
 	-rm *.o
 	-rm *.so
+	-rm *.a
 
