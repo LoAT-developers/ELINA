@@ -494,7 +494,7 @@ then
     fi
 else
     has_timing=1
-    has_native=1
+    has_native=0
     if test $force_absolute_dylib_install_names -eq 1
     then
 	echo "ignoring option \`-absolute-dylibs', only meaningful under OSX";
